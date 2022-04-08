@@ -1,0 +1,93 @@
+0       32      64      96     128     160     192     224    255 <- IP (host) 
+|-------|-------|-------|-------|-------|-------|-------|-------| <- Rede 192.120.0. 
+ .1                 .80                                           <- Endereços fixos
+DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDAAAAAAAABBBBBBBBCCCC123           <- Atribuições de subredes
+
+Rede | IPs | Restrições | Total (+rede+BCast+GW?) | Máscara - bloco | Gama (Rede - BCast) | Gateway
+----------------------------------------------------------------------------------------------------
+  A  | 16  |            | 16 + 1 + 1 + 1 = 19     | .224 /27 - 32   | .128 - .159         | .158
+  B  | 20  |            | 20 + 1 + 1 + 1 = 23     | .224 /27 - 32   | .160 - .191         | .190
+  C  | 8   |            | 8 + 1 + 1 + 1  = 11     | .240 /28 - 16   | .192 - .207         | .206
+  D  | 30  | .1 .80     | 30 + 1 + 1 + 1 = 33 (80)| .128 /25 - 128  | .0 - .127           | .126
+1 AB | 2   |            | 2 + 1 + 1      = 4      | .252 /30 - 4    | .208 - .211         | X (.209 .210 são GW um do outro)
+2 BC | 2   |            | 2 + 1 + 1      = 4      | .252 /30 - 4    | .212 - .215         | X (.213 .214 são GW um do outro)
+3 CD | 2   |            | 2 + 1 + 1      = 4      | .252 /30 - 4    | .216 - .219         | X (.217 .218 são GW um do outro)
+  
+Binário Decimal CIDR Bloco
+10000000 .128   /25   128
+11000000 .192   /26   64
+11100000 .224   /27   32
+11110000 .240   /28   16
+11111000 .248   /29   8
+11111100 .252   /30   4
+11111110 .254   /31   2
+
+!comandos router rede A
+enable
+configure terminal
+interface FastEthernet0/0
+ip address 192.120.0.209 255.255.255.252
+no shutdown
+interface FastEthernet0/1
+ip address 192.120.0.158 255.255.255.224
+no shutdown
+exit
+!para a rede D
+ip route 192.120.0.0 255.255.255.128 192.120.0.210
+!para a rede B
+ip route 192.120.0.160 255.255.255.224 192.120.0.210
+
+!comandos router rede B
+enable
+configure terminal
+interface FastEthernet0/0
+ip address 192.120.0.210 255.255.255.252
+no shutdown
+interface FastEthernet0/1
+ip address 192.120.0.160 255.255.255.224
+no shutdown
+interface Serial0/0/0
+ip address 192.120.0.113 255.255.255.252
+no shutdown
+exit
+!para a rede D
+ip route 192.120.0.0 255.255.255.128 192.120.0.214
+!para a rede A
+ip route 192.120.0.128 255.255.255.224 192.120.0.209
+
+!comandos router rede C
+enable
+configure terminal
+interface FastEthernet0/0
+ip address 192.120.0.217 255.255.255.252
+no shutdown
+interface FastEthernet0/1
+ip address 192.120.0.206 255.255.255.240
+no shutdown
+interface Serial0/0/0
+ip address 192.120.0.214 255.255.255.252
+no shutdown
+exit
+!para a rede D
+ip route 192.120.0.0 255.255.255.128 192.120.0.218
+!para a rede A
+ip route 192.120.0.128 255.255.255.224 192.120.0.213
+!para a rede B
+ip route 192.120.0.160 255.255.255.224 192.120.0.213
+
+!comandos router rede D
+enable
+configure terminal
+interface FastEthernet0/0
+ip address 192.120.0.218 255.255.255.252
+no shutdown
+interface FastEthernet0/1
+ip address 192.120.0.126 255.255.255.128
+no shutdown
+exit
+!para a rede A
+ip route 192.120.0.128 255.255.255.224 192.120.0.217
+!para a rede B
+ip route 192.120.0.160 255.255.255.224 192.120.0.217
+!para a rede C
+ip route 192.120.0.192 255.255.255.240 192.120.0.217

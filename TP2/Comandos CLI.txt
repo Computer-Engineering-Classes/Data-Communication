@@ -1,0 +1,37 @@
+en -> modo EXEC
+
+conf t -> modo de configuração
+
+end / exit -> sair
+
+Dentro do modo de configuração:
+
+no ip domain-lookup -> desativar DNS
+
+enable secret class -> definir passe 'class' para modo EXEC
+
+line con 0; pass cisco login -> definir passe 'cisco' para consola
+
+line vty 0 4; pass cisco login -> definir passe 'cisco' para terminal virtual (linhas 0-4)
+
+int [nome] -> configuração da interface [nome]
+
+ip add [endereço] [mask] -> configuração de endereço IPv4 e respetiva máscara
+
+ipv6 uni -> ativação do IPv6
+
+ipv6 add [endereço] [mask] -> configuração de endereço IPv6 e respetiva máscara
+
+Rotas:
+
+Estática: ip route [destino] [mask] [salto]
+
+RIP: router rip; version 2; network [endereço]
+
+Fora do modo de configuração:
+
+hostname [nome] -> configuração do nome do host
+
+copy run start -> salvar configuração atual
+
+sh start / run -> consultar configuração de início / atual
